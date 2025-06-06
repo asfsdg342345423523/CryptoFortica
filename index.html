@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoFortica - Your Cybersecurity Fortress</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: #0a0a0a;
+            color: #00ff41;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        .matrix-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            opacity: 0.08;
+        }
+        .header {
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #00ff41;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #00ff41;
+            text-shadow: 0 0 10px #00ff41;
+            cursor: pointer;
+        }
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            transition: all 0.3s;
+        }
+        .nav-links li { }
+        .nav-links a {
+            color: #00ff41;
+            text-decoration: none;
+            font-weight: 400;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+        .nav-links a:hover {
+            border: 1px solid #00ff41;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+            background: rgba(0, 255, 65, 0.1);
+        }
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            z-index: 1100;
+        }
+        .mobile-menu span {
+            width: 25px;
+            height: 3px;
+            background: #00ff41;
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+        /* Responsive Nav */
+        @media (max-width: 900px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 60px;
+                right: 0;
+                background: #000;
+                width: 100vw;
+                flex-direction: column;
+                gap: 0;
+                border-bottom: 1px solid #00ff41;
+            }
+            .nav-links.active {
+                display: flex;
+            }
+            .nav-links li {
+                border-bottom: 1px solid #222;
+                text-align: center;
+            }
+            .mobile-menu {
+                display: flex;
+            }
+        }
+        /* Sections */
+        .section {
+            min-height: 100vh;
+            padding: 6rem 2rem 4rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: none;
+        }
+        .section.active { display: block; }
+        .section#home { display: block; }
+        .section-title {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            text-shadow: 0 0 20px #00ff41;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #00ff41; }
+            to { text-shadow: 0 0 30px #00ff41, 0 0 40px #00ff41; }
+        }
+        /* Hero Section */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(0, 255, 65, 0.1) 0%, transparent 70%);
+        }
+        .hero-content { max-width: 900px; }
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 30px #00ff41;
+            animation: glitch 3s infinite;
+        }
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); }
+            10% { transform: translate(-2px, -1px); }
+            20% { transform: translate(2px, 1px); }
+            30% { transform: translate(-1px, 2px); }
+            40% { transform: translate(1px, -1px); }
+        }
+        .hero-subtitle {
+            font-size: 1.4rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            line-height: 1.8;
+        }
+        .terminal-window {
+            background: #000;
+            border: 2px solid #00ff41;
+            border-radius: 8px;
+            margin: 3rem 0;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+            overflow: hidden;
+        }
+        .terminal-header {
+            background: #1a1a1a;
+            padding: 0.8rem 1.5rem;
+            border-bottom: 1px solid #00ff41;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27ca3f; }
+        .terminal-content {
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            min-height: 150px;
+        }
+        .typing-line {
+            overflow: hidden;
+            border-right: 2px solid #00ff41;
+            white-space: nowrap;
+            animation: typing 4s steps(60, end), blink-caret 0.75s step-end infinite;
+        }
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #00ff41; }
+        }
+        /* CTA Buttons */
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 1.2rem 2.5rem;
+            background: transparent;
+            color: #00ff41;
+            border: 2px solid #00ff41;
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border-radius: 5px;
+            text-transform: uppercase;
+        }
+        .cta-button:hover {
+            background: #00ff41;
+            color: #000;
+            box-shadow: 0 0 40px rgba(0, 255, 65, 0.6);
+            transform: translateY(-3px);
+        }
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        .cta-button:hover::before { left: 100%; }
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+            margin-top: 3rem;
+        }
+        .feature-card {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff41;
+            padding: 2.5rem;
+            border-radius: 12px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00ff41, #00aa33, #00ff41);
+            transform: translateX(-100%);
+            transition: transform 0.4s ease;
+        }
+        .feature-card:hover::before { transform: translateX(0); }
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 255, 65, 0.3);
+            background: rgba(0, 255, 65, 0.08);
+            border-color: #00ff41;
+        }
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: #00ff41;
+            text-shadow: 0 0 15px #00ff41;
+        }
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #00ff41;
+            text-shadow: 0 0 10px #00ff41;
+        }
+        .feature-card p {
+            opacity: 0.85;
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+        /* Blog/Posts Section */
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2.5rem;
+            margin-top: 3rem;
+        }
+        .post-card {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00ff41;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .post-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.2);
+            border-color: #00ff41;
+        }
+        .post-image {
+            height: 200px;
+            background: linear-gradient(135deg, #00ff41, #00aa33);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #000;
+        }
+        .post-content { padding: 2rem; }
+        .post-date {
+            color: #00aa33;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        .post-title {
+            font-size: 1.3rem;
+            color: #00ff41;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+        .post-excerpt {
+            opacity: 0.8;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        .read-more {
+            color: #00ff41;
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .read-more:hover {
+            border-bottom-color: #00ff41;
+            text-shadow: 0 0 10px #00ff41;
+        }
+        /* About Section */
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .about-text {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+            text-align: center;
+        }
+        .stat-item {
+            background: rgba(0, 255, 65, 0.1);
+            padding: 2rem;
+            border-radius: 10px;
+            border: 1px solid #00ff41;
+        }
+        .stat-number {
+            font-size: 3rem;
+            color: #00ff41;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 20px #00ff41;
+            font-weight: 700;
+        }
+        .stat-label {
+            opacity: 0.8;
+            font-size: 1rem;
+        }
+        /* Contact Section */
+        .contact-content {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .contact-form { margin-top: 3rem; }
+        .form-group {
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #00ff41;
+            font-weight: 500;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ff41;
+            border-radius: 5px;
+            color: #00ff41;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+            border-color: #00ff41;
+        }
+        .form-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+        /* Footer */
+        .footer {
+            background: #000;
+            border-top: 2px solid #00ff41;
+            padding: 3rem 2rem 2rem;
+            text-align: center;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .footer-text {
+            opacity: 0.8;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .social-links a {
+            color: #00ff41;
+            text-decoration: none;
+            padding: 1rem 1.5rem;
+            border: 1px solid #00ff41;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .social-links a:hover {
+            background: #00ff41;
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+        }
+        /* Mobile Responsive */
+        @media (max-width: 900px) {
+            .hero h1 { font-size: 2.5rem; }
+            .hero-subtitle { font-size: 1.1rem; }
+            .section { padding: 4rem 1rem 2rem; }
+            .section-title { font-size: 2.2rem; }
+            .features-grid, .posts-grid { grid-template-columns: 1fr; }
+            .cta-buttons { flex-direction: column; align-items: center; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .social-links { flex-wrap: wrap; }
+        }
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #00ff41; border-radius: 6px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00aa33; }
+    </style>
+</head>
+<body>
+    <canvas class="matrix-bg" id="matrix"></canvas>
+    <header class="header">
+        <nav class="nav" aria-label="Main navigation">
+            <div class="logo" onclick="showSection('home')" aria-label="CryptoFortica Home">CryptoFortica</div>
+            <ul class="nav-links">
+                <li><a href="#" onclick="showSection('home')">Home</a></li>
+                <li><a href="#" onclick="showSection('tutorials')">Tutorials</a></li>
+                <li><a href="#" onclick="showSection('blog')">Blog</a></li>
+                <li><a href="#" onclick="showSection('tools')">Tools</a></li>
+                <li><a href="#" onclick="showSection('about')">About</a></li>
+                <li><a href="#" onclick="showSection('contact')">Contact</a></li>
+            </ul>
+            <div class="mobile-menu" aria-label="Open navigation menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+    <!-- HOME SECTION -->
+    <section class="section hero active" id="home">
+        <div class="hero-content">
+            <h1>DEFEND YOUR DIGITAL WORLD</h1>
+            <p class="hero-subtitle">Welcome to CryptoFortica, where cybersecurity professionals and enthusiasts unite to build impenetrable digital defenses. Transform from defender to guardian.</p>
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-dot dot-red"></div>
+                    <div class="terminal-dot dot-yellow"></div>
+                    <div class="terminal-dot dot-green"></div>
+                    <span style="margin-left: 1rem; color: #666;">security@cryptofortica:~$</span>
+                </div>
+                <div class="terminal-content">
+                    <div class="typing-line">
+                        > Initializing cybersecurity fortress...<br>
+                        > Loading threat intelligence database...<br>
+                        > Activating defensive protocols...<br>
+                        > System ready. Welcome, Guardian.
+                    </div>
+                </div>
+            </div>
+            <div class="cta-buttons">
+                <a href="#" class="cta-button" onclick="showSection('tutorials')">Start Learning</a>
+                <a href="#" class="cta-button" onclick="showSection('blog')">Read Blog</a>
+                <a href="#" class="cta-button" onclick="showSection('contact')">Join Community</a>
+            </div>
+        </div>
+    </section>
+    <!-- TUTORIALS SECTION -->
+    <section class="section" id="tutorials">
+        <h2 class="section-title">CYBER ARSENAL</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3>Penetration Testing</h3>
+                <p>Master ethical hacking techniques. Learn Kali Linux, vulnerability assessment, and real-world penetration testing methodologies used by security professionals.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3>Digital Forensics</h3>
+                <p>Investigate cyber incidents like a detective. Evidence collection, malware analysis, incident response, and forensic tools for cybercrime investigation.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚔️</div>
+                <h3>Malware Analysis</h3>
+                <p>Dissect malicious software safely. Reverse engineering, sandboxing, dynamic analysis, and understanding attack vectors used by cybercriminals.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Bug Bounty Hunting</h3>
+                <p>Turn your skills into rewards. Learn vulnerability research, responsible disclosure, and how to earn money finding security flaws ethically.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3>Network Security</h3>
+                <p>Secure the digital highways. Firewall configuration, intrusion detection, network monitoring, and advanced threat hunting techniques.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📡</div>
+                <h3>Wireless Security</h3>
+                <p>Master WiFi and wireless protocols. WPA cracking, rogue access points, bluetooth security, and IoT device vulnerability assessment.</p>
+            </div>
+        </div>
+    </section>
+    <!-- BLOG SECTION -->
+    <section class="section" id="blog">
+        <h2 class="section-title">LATEST INTEL</h2>
+        <div class="posts-grid">
+            <article class="post-card">
+                <div class="post-image">🚨</div>
+                <div class="post-content">
+                    <div class="post-date">January 15, 2025</div>
+                    <h3 class="post-title">Critical Zero-Day Exploits: Q1 2025 Threat Report</h3>
+                    <p class="post-excerpt">Analysis of the most dangerous vulnerabilities discovered this quarter and how attackers are weaponizing them in the wild.</p>
+                    <a href="#" class="read-more">Read Full Report →</a>
+                </div>
+            </article>
+            <article class="post-card">
+                <div class="post-image">🛡️</div>
+                <div class="post-content">
+                    <div class="post-date">January 12, 2025</div>
+                    <h3 class="post-title">Advanced Persistence Techniques: APT Group Analysis</h3>
+                    <p class="post-excerpt">Deep dive into how nation-state actors maintain long-term access to compromised networks and how to detect their presence.</p>
+                    <a href="#" class="read-more">Read Analysis →</a>
+                </div>
+            </article>
+            <article class="post-card">
+                <div class="post-image">🔍</div>
+                <div class="post-content">
+                    <div class="post-date">January 10, 2025</div>
+                    <h3 class="post-title">Ransomware Evolution: New Tactics and Defense Strategies</h3>
+                    <p class="post-excerpt">How ransomware groups are adapting their techniques and what organizations can do to protect against these evolving threats.</p>
+                    <a href="#" class="read-more">Read Strategy Guide →</a>
+                </div>
+            </article>
+            <article class="post-card">
+                <div class="post-image">⚡</div>
+                <div class="post-content">
+                    <div class="post-date">January 8, 2025</div>
+                    <h3 class="post-title">AI-Powered Security Tools: The Future is Now</h3>
+                    <p class="post-excerpt">Exploring how artificial intelligence is revolutionizing threat detection, incident response, and automated security operations.</p>
+                    <a href="#" class="read-more">Explore Tools →</a>
+                </div>
+            </article>
+        </div>
+    </section>
+    <!-- TOOLS SECTION -->
+    <section class="section" id="tools">
+        <h2 class="section-title">SECURITY TOOLKIT</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🔧</div>
+                <h3>Custom Exploit Scripts</h3>
+                <p>Ready-to-use penetration testing scripts. Automated vulnerability scanners, payload generators, and exploitation frameworks for ethical hacking.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Threat Intelligence Feed</h3>
+                <p>Real-time threat data aggregation. IOCs, malware signatures, and threat actor attribution from multiple intelligence sources worldwide.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🕵️</div>
+                <h3>OSINT Investigation Kit</h3>
+                <p>Open source intelligence gathering tools. Social media analysis, domain reconnaissance, and digital footprint mapping utilities.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔐</div>
+                <h3>Cryptography Utilities</h3>
+                <p>Encryption and decryption tools. Hash crackers, cipher analysis, and cryptographic protocol testing for security assessments.</p>
+            </div>
+        </div>
+    </section>
+    <!-- ABOUT SECTION -->
+    <section class="section" id="about">
+        <h2 class="section-title">ABOUT CRYPTOFORTICA</h2>
+        <div class="about-content">
+            <p class="about-text">
+                CryptoFortica was founded by cybersecurity professionals who believe that knowledge should be accessible to all defenders. We're building the next generation of security experts through hands-on learning, real-world scenarios, and cutting-edge threat intelligence.
+            </p>
+            <p class="about-text">
+                Our mission is simple: empower every individual and organization to defend against cyber threats. Whether you're a beginner taking your first steps into cybersecurity or a seasoned professional staying current with emerging threats, we're here to support your journey.
+            </p>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">50K+</div>
+                    <div class="stat-label">Security Professionals</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">200+</div>
+                    <div class="stat-label">Hands-On Tutorials</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Threat Monitoring</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">99.9%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- CONTACT SECTION -->
+    <section class="section" id="contact">
+        <h2 class="section-title">JOIN THE FORTRESS</h2>
+        <div class="contact-content">
+            <p class="about-text">
+                Ready to level up your cybersecurity skills? Join our community of security professionals, ask questions, share knowledge, and stay ahead of emerging threats.
+            </p>
+            <form class="contact-form" action="#" method="POST">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="specialty">Security Specialty</label>
+                    <input type="text" id="specialty" name="specialty" placeholder="e.g., Penetration Testing, Digital Forensics">
+                </div>
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" placeholder="Tell us about your cybersecurity interests..."></textarea>
+                </div>
+                <button type="submit" class="cta-button">Send Message</button>
+            </form>
+        </div>
+    </section>
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p class="footer-text">© 2025 CryptoFortica. Securing the digital frontier, one guardian at a time.</p>
+            <p class="footer-text">Transform from defender to guardian. Start your cybersecurity journey today.</p>
+            <div class="social-links">
+                <a href="#">Discord</a>
+                <a href="#">GitHub</a>
+                <a href="#">Twitter</a>
+                <a href="#">LinkedIn</a>
+                <a href="#">YouTube</a>
+            </div>
+        </div>
+    </footer>
+    <script>
+        // Matrix rain effect
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        function resizeMatrix() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            fontSize = 10;
+            columns = Math.floor(canvas.width / fontSize);
+            drops = [];
+            for(let x = 0; x < columns; x++) drops[x] = 1;
+        }
+        let fontSize = 10;
+        let columns = Math.floor(window.innerWidth / fontSize);
+        let drops = [];
+        for(let x = 0; x < columns; x++) drops[x] = 1;
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00ff41';
+            ctx.font = fontSize + 'px JetBrains Mono';
+            const matrix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%+-/~{[|`]}";
+            const matrixArray = matrix.split("");
+            for(let i = 0; i < drops.length; i++) {
+                const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        setInterval(draw, 35);
+        window.addEventListener('resize', resizeMatrix);
+        // Section navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            // Close mobile nav after click
+            document.querySelector('.nav-links').classList.remove('active');
+        }
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu').addEventListener('click', function() {
+            document.querySelector('.nav-links').classList.toggle('active');
+        });
+        // Card hover effect (for desktop)
+        document.querySelectorAll('.feature-card, .post-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-8px)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+        // Form submission
+        document.querySelector('.contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Thanks for your message! We\'ll get back to you soon.');
+        });
+        // Initial matrix resize
+        resizeMatrix();
+    </script>
+</body>
+</html>
